@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MellaRuda Studio — Mobile Gaming Excellence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --neon: #00ffe1;
+    --neon2: #ff2d78;
+    --neon3: #ffe600;
+    --bg: #040a12;
+    --bg2: #070e1a;
+    --card: rgba(255,255,255,0.04);
+    --border: rgba(0,255,225,0.18);
+    --text: #c8dff0;
+    --white: #f0faff;
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px;
+    overflow-x: hidden;
+    cursor: none;
+  }
+  #cursor {
+    width: 14px; height: 14px;
+    background: var(--neon);
+    border-radius: 50%;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none; z-index: 9999;
+    mix-blend-mode: difference;
+    box-shadow: 0 0 18px var(--neon);
+  }
+  #cursor-ring {
+    width: 38px; height: 38px;
+    border: 1.5px solid var(--neon);
+    border-radius: 50%;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none; z-index: 9998;
+    opacity: .5;
+  }
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 1000;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 5vw; height: 72px;
+    background: rgba(4,10,18,0.92);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--border);
+    transition: background .3s;
+  }
+  .nav-logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.2rem; font-weight: 900;
+    color: var(--white); letter-spacing: .1em;
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--neon); }
+  nav ul { display: flex; gap: 2.5rem; list-style: none; }
+  nav ul a {
+    font-family: 'Rajdhani'; font-weight: 600; font-size: .95rem;
+    color: var(--text); text-decoration: none;
+    letter-spacing: .12em; text-transform: uppercase;
+    position: relative; transition: color .3s;
+  }
+  nav ul a::after {
+    content:''; position: absolute;
+    bottom: -4px; left: 0; right: 100%;
+    height: 1.5px; background: var(--neon);
+    transition: right .3s;
+  }
+  nav ul a:hover { color: var(--neon); }
+  nav ul a:hover::after { right: 0; }
+
+  /* HERO */
+  #hero {
+    position: relative; height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .hero-grid {
+    position: absolute; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(0,255,225,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,225,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridDrift 20s linear infinite;
+  }
+  @keyframes gridDrift { to { background-position: 0 60px; } }
+  .hero-glow {
+    position: absolute; top: 10%; left: 50%; transform: translateX(-50%);
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(0,255,225,0.07) 0%, transparent 65%);
+    z-index: 0;
+  }
+  .hero-glow2 {
+    position: absolute; bottom: -10%; right: -10%;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(255,45,120,0.06) 0%, transparent 65%);
+    z-index: 0;
+  }
+  #particleCanvas { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+  .hero-content {
+    position: relative; z-index: 2;
+    text-align: center;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 1.4rem;
+  }
+  .hero-tag {
+    font-family: 'Space Mono'; font-size: .75rem;
+    color: var(--neon); letter-spacing: .3em; text-transform: uppercase;
+    animation: fadeUp .8s .1s both;
+  }
+  .hero-title {
+    font-family: 'Orbitron'; font-size: clamp(2.5rem, 7vw, 6rem);
+    font-weight: 900; line-height: 1; color: var(--white);
+    animation: fadeUp .9s .3s both;
+  }
+  .hero-title .a1 { color: var(--neon); }
+  .hero-title .a2 { color: var(--neon2); }
+  .hero-sub {
+    font-size: clamp(1rem, 2.5vw, 1.35rem);
+    max-width: 580px; line-height: 1.6;
+    animation: fadeUp .9s .5s both;
+  }
+  .hero-cta { display: flex; gap: 1rem; animation: fadeUp .9s .7s both; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .scroll-ind {
+    position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center;
+    gap: .5rem; z-index: 2; animation: fadeUp .8s 1.2s both;
+  }
+  .scroll-ind span { font-family: 'Space Mono'; font-size: .65rem; color: var(--neon); letter-spacing: .2em; }
+  .scroll-line {
+    width: 1px; height: 60px;
+    background: linear-gradient(to bottom, var(--neon), transparent);
+    animation: scrollPulse 1.8s ease-in-out infinite;
+  }
+  @keyframes scrollPulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+
+  /* BUTTONS */
+  .btn {
+    padding: .75rem 2.2rem; border-radius: 2px;
+    font-family: 'Rajdhani'; font-weight: 700;
+    font-size: 1rem; letter-spacing: .12em; text-transform: uppercase;
+    cursor: pointer; text-decoration: none; transition: all .3s; display: inline-block;
+  }
+  .btn-primary { background: var(--neon); color: #040a12; border: 2px solid var(--neon); }
+  .btn-primary:hover { background: transparent; color: var(--neon); box-shadow: 0 0 30px rgba(0,255,225,0.4); }
+  .btn-ghost { background: transparent; color: var(--white); border: 2px solid rgba(255,255,255,0.25); }
+  .btn-ghost:hover { border-color: var(--neon2); color: var(--neon2); box-shadow: 0 0 20px rgba(255,45,120,0.25); }
+
+  /* SECTIONS */
+  section { padding: 110px 5vw; }
+  .section-label { font-family: 'Space Mono'; font-size: .7rem; color: var(--neon); letter-spacing: .3em; text-transform: uppercase; margin-bottom: .8rem; }
+  .section-title { font-family: 'Orbitron'; font-weight: 900; font-size: clamp(2rem, 4vw, 3.2rem); color: var(--white); line-height: 1.1; margin-bottom: .8rem; }
+  .section-title span { color: var(--neon); }
+  .divider { width: 80px; height: 3px; background: linear-gradient(90deg, var(--neon), transparent); margin-bottom: 2rem; }
+
+  /* MARQUEE BANDS */
+  .band { height: 200px; overflow: hidden; display: flex; align-items: center; }
+  .mq { display: flex; white-space: nowrap; animation: mq 22s linear infinite; }
+  .mq.rev { animation-direction: reverse; }
+  .mq span {
+    font-family: 'Orbitron'; font-size: clamp(4rem,9vw,8rem);
+    font-weight: 900; color: rgba(255,255,255,0.025);
+    letter-spacing: .05em; padding-right: 4rem; flex-shrink: 0;
+  }
+  @keyframes mq { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+  /* ABOUT */
+  #about { background: var(--bg2); }
+  .about-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; max-width: 1200px; margin: 0 auto; }
+  .about-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2.5rem; }
+  .stat { background: var(--card); border: 1px solid var(--border); padding: 1.5rem; position: relative; }
+  .stat::before { content:''; position: absolute; top:0; left:0; right:0; height:2px; background: var(--neon); }
+  .stat-num { font-family: 'Orbitron'; font-size: 2.6rem; font-weight: 900; color: var(--white); line-height: 1; }
+  .stat-num span { color: var(--neon); font-size: 1.6rem; }
+  .stat-label { font-size: .9rem; color: var(--text); margin-top: .4rem; }
+  .about-p { line-height: 1.8; font-size: 1.05rem; }
+  .about-p + .about-p { margin-top: 1rem; }
+
+  /* WORK */
+  #work { background: var(--bg); }
+  .work-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; max-width: 1200px; margin: 0 auto; }
+  .game-card { border: 1px solid var(--border); background: var(--card); transition: transform .4s, border-color .4s, box-shadow .4s; overflow: hidden; }
+  .game-card:hover { transform: translateY(-8px); border-color: var(--neon); box-shadow: 0 20px 60px rgba(0,255,225,0.12); }
+  .game-art { width: 100%; aspect-ratio: 16/10; display: block; }
+  .game-art svg { width: 100%; height: 100%; display: block; }
+  .game-info { padding: 1.2rem 1.4rem; }
+  .game-platform { font-family: 'Space Mono'; font-size: .65rem; color: var(--neon2); letter-spacing: .2em; text-transform: uppercase; margin-bottom: .4rem; }
+  .game-title { font-family: 'Orbitron'; font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: .5rem; }
+  .game-desc { font-size: .9rem; line-height: 1.6; }
+  .game-tag { display: inline-block; margin-top: .8rem; padding: .25rem .7rem; background: rgba(0,255,225,0.08); border: 1px solid rgba(0,255,225,0.2); font-size: .75rem; color: var(--neon); font-family: 'Space Mono'; letter-spacing: .1em; }
+
+  /* TRUSTED */
+  #trusted { background: var(--bg2); }
+  .logos-grid { display: grid; grid-template-columns: repeat(6,1fr); max-width: 1200px; margin: 0 auto; border: 1px solid var(--border); }
+  .logo-item { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1rem; gap: .6rem; border: 1px solid var(--border); background: var(--card); transition: background .3s; }
+  .logo-item:hover { background: rgba(0,255,225,0.05); }
+  .logo-icon { width: 38px; height: 38px; }
+  .logo-name { font-family: 'Orbitron'; font-size: .6rem; font-weight: 700; color: rgba(200,223,240,0.55); letter-spacing: .08em; text-transform: uppercase; text-align: center; }
+
+  /* SERVICES */
+  #services { background: var(--bg); }
+  .services-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; max-width: 1200px; margin: 0 auto; }
+  .service-card { padding: 2rem; background: var(--card); border: 1px solid var(--border); position: relative; overflow: hidden; transition: border-color .3s, transform .3s; }
+  .service-card:hover { border-color: var(--neon); transform: translateY(-5px); }
+  .service-card::after { content:''; position: absolute; bottom:0; left:0; right:100%; height:2px; background: var(--neon); transition: right .4s; }
+  .service-card:hover::after { right: 0; }
+  .service-icon { width: 48px; height: 48px; margin-bottom: 1.2rem; }
+  .service-name { font-family: 'Orbitron'; font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: .7rem; }
+  .service-desc { font-size: .95rem; line-height: 1.7; }
+
+  /* CONTACT */
+  #contact { background: var(--bg2); }
+  .contact-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; max-width: 1200px; margin: 0 auto; }
+  .contact-item { display: flex; gap: 1rem; align-items: flex-start; margin-bottom: 2rem; }
+  .contact-icon { width: 44px; height: 44px; flex-shrink: 0; background: rgba(0,255,225,0.07); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; }
+  .contact-label { font-family: 'Space Mono'; font-size: .7rem; color: var(--neon); letter-spacing: .15em; text-transform: uppercase; margin-bottom: .3rem; }
+  .contact-value { font-size: 1rem; color: var(--white); font-weight: 600; }
+  .contact-form { display: flex; flex-direction: column; gap: 1rem; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .contact-form input, .contact-form textarea { width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--white); padding: .85rem 1rem; font-family: 'Rajdhani'; font-size: 1rem; outline: none; transition: border-color .3s; }
+  .contact-form input:focus, .contact-form textarea:focus { border-color: var(--neon); }
+  .contact-form textarea { resize: none; height: 130px; }
+
+  /* FOOTER */
+  footer { background: #020710; border-top: 1px solid var(--border); padding: 2.5rem 5vw; display: flex; align-items: center; justify-content: space-between; }
+  .footer-logo { font-family: 'Orbitron'; font-size: 1rem; font-weight: 900; color: var(--white); }
+  .footer-logo span { color: var(--neon); }
+  .footer-copy { font-family: 'Space Mono'; font-size: .65rem; color: rgba(200,223,240,0.35); letter-spacing: .1em; }
+
+  /* REVEAL — visible by default; JS hides then animates */
+  .reveal, .reveal-left, .reveal-right { transition: opacity .7s, transform .7s; }
+  .js .reveal       { opacity: 0; transform: translateY(40px); }
+  .js .reveal-left  { opacity: 0; transform: translateX(-50px); }
+  .js .reveal-right { opacity: 0; transform: translateX(50px); }
+  .reveal.on, .reveal-left.on, .reveal-right.on { opacity: 1 !important; transform: none !important; }
+  .stagger > * { transition: opacity .6s, transform .6s; }
+  .js .stagger > * { opacity: 0; transform: translateY(30px); }
+  .stagger.on > *:nth-child(1)  { opacity:1!important; transform:none!important; transition-delay:.05s }
+  .stagger.on > *:nth-child(2)  { opacity:1!important; transform:none!important; transition-delay:.12s }
+  .stagger.on > *:nth-child(3)  { opacity:1!important; transform:none!important; transition-delay:.19s }
+  .stagger.on > *:nth-child(4)  { opacity:1!important; transform:none!important; transition-delay:.26s }
+  .stagger.on > *:nth-child(5)  { opacity:1!important; transform:none!important; transition-delay:.33s }
+  .stagger.on > *:nth-child(6)  { opacity:1!important; transform:none!important; transition-delay:.40s }
+  .stagger.on > *:nth-child(7)  { opacity:1!important; transform:none!important; transition-delay:.47s }
+  .stagger.on > *:nth-child(8)  { opacity:1!important; transform:none!important; transition-delay:.54s }
+  .stagger.on > *:nth-child(9)  { opacity:1!important; transform:none!important; transition-delay:.61s }
+  .stagger.on > *:nth-child(10) { opacity:1!important; transform:none!important; transition-delay:.68s }
+  .stagger.on > *:nth-child(11) { opacity:1!important; transform:none!important; transition-delay:.75s }
+  .stagger.on > *:nth-child(12) { opacity:1!important; transform:none!important; transition-delay:.82s }
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#hero" class="nav-logo">Mella<span>Ruda</span></a>
+  <ul>
+    <li><a href="#about">Chi Siamo</a></li>
+    <li><a href="#work">I Nostri Giochi</a></li>
+    <li><a href="#trusted">Ci Hanno Scelto</a></li>
+    <li><a href="#services">Servizi</a></li>
+    <li><a href="#contact">Contatti</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <canvas id="particleCanvas"></canvas>
+  <div class="hero-content">
+    <p class="hero-tag">// Mobile Gaming Studio — Dal 2008</p>
+    <h1 class="hero-title">Creiamo<br><span class="a1">Giochi</span> <span class="a2">Casual</span><br>Indimenticabili</h1>
+    <p class="hero-sub">Sviluppo di giochi mobile su misura per iOS e Android. Per brand, publisher e visionari — consegniamo esperienze che creano dipendenza.</p>
+    <div class="hero-cta">
+      <a href="#work" class="btn btn-primary">Vedi i Nostri Giochi</a>
+      <a href="#contact" class="btn btn-ghost">Inizia un Progetto</a>
+    </div>
+  </div>
+  <div class="scroll-ind"><span>Scorri</span><div class="scroll-line"></div></div>
+</section>
+
+<!-- BAND 1 -->
+<div class="band" style="background:#040a12">
+  <div class="mq">
+    <span>CASUAL GAMING · iOS · ANDROID · MOBILE GAMES · </span>
+    <span>CASUAL GAMING · iOS · ANDROID · MOBILE GAMES · </span>
+    <span>CASUAL GAMING · iOS · ANDROID · MOBILE GAMES · </span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-inner">
+    <div class="reveal-left">
+      <p class="section-label">// 01 — Chi Siamo</p>
+      <h2 class="section-title">About <span>MellaRuda</span></h2>
+      <div class="divider"></div>
+      <p class="about-p">MellaRuda Studio è uno studio indipendente di giochi mobile con sede a Milano, attivo dal 2008. In oltre 17 anni abbiamo creato più di 80 giochi casual per iOS e Android — per publisher internazionali, startup innovative e brand della Fortune 500.</p>
+      <p class="about-p">Il nostro team di 40 professionisti unisce game designer, artisti 2D/3D, sviluppatori Unity e Unreal, specialisti UX e analisti di monetizzazione. Non utilizziamo template predefiniti — ogni gioco nasce da zero, su misura per il cliente.</p>
+      <div class="about-stats stagger">
+        <div class="stat"><div class="stat-num">17<span>+</span></div><div class="stat-label">Anni di esperienza</div></div>
+        <div class="stat"><div class="stat-num">80<span>+</span></div><div class="stat-label">Giochi pubblicati</div></div>
+        <div class="stat"><div class="stat-num">320<span>M</span></div><div class="stat-label">Download globali</div></div>
+        <div class="stat"><div class="stat-num">40<span>+</span></div><div class="stat-label">Professionisti</div></div>
+      </div>
+    </div>
+    <div class="reveal-right">
+      <svg viewBox="0 0 480 480" xmlns="http://www.w3.org/2000/svg" style="width:100%;filter:drop-shadow(0 0 40px rgba(0,255,225,0.15))">
+        <defs>
+          <linearGradient id="gA" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00ffe1" stop-opacity=".15"/><stop offset="100%" stop-color="#ff2d78" stop-opacity=".1"/></linearGradient>
+          <linearGradient id="gB" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00ffe1"/><stop offset="100%" stop-color="#ff2d78"/></linearGradient>
+        </defs>
+        <polygon points="240,30 420,135 420,345 240,450 60,345 60,135" fill="url(#gA)" stroke="url(#gB)" stroke-width="1.5"/>
+        <polygon points="240,80 390,157.5 390,322.5 240,400 90,322.5 90,157.5" fill="none" stroke="rgba(0,255,225,0.1)" stroke-width="1"/>
+        <polygon points="240,130 360,180 360,300 240,350 120,300 120,180" fill="none" stroke="rgba(0,255,225,0.08)" stroke-width="1"/>
+        <rect x="155" y="185" width="170" height="110" rx="28" fill="none" stroke="#00ffe1" stroke-width="2.5" opacity=".8"/>
+        <circle cx="195" cy="235" r="18" fill="none" stroke="#00ffe1" stroke-width="2" opacity=".6"/>
+        <line x1="195" y1="220" x2="195" y2="250" stroke="#00ffe1" stroke-width="2" opacity=".6"/>
+        <line x1="180" y1="235" x2="210" y2="235" stroke="#00ffe1" stroke-width="2" opacity=".6"/>
+        <circle cx="290" cy="222" r="5" fill="#ff2d78" opacity=".9"/>
+        <circle cx="307" cy="235" r="5" fill="#ffe600" opacity=".9"/>
+        <circle cx="290" cy="248" r="5" fill="#00ffe1" opacity=".9"/>
+        <circle cx="273" cy="235" r="5" fill="rgba(255,255,255,.5)"/>
+        <rect x="225" y="182" width="30" height="6" rx="3" fill="#00ffe1" opacity=".4"/>
+        <rect x="225" y="297" width="30" height="6" rx="3" fill="#00ffe1" opacity=".4"/>
+        <circle cx="240" cy="30" r="4" fill="#00ffe1" opacity=".7"/>
+        <circle cx="420" cy="135" r="4" fill="#ff2d78" opacity=".7"/>
+        <circle cx="420" cy="345" r="4" fill="#ffe600" opacity=".7"/>
+        <circle cx="240" cy="450" r="4" fill="#00ffe1" opacity=".7"/>
+        <circle cx="60" cy="345" r="4" fill="#ff2d78" opacity=".7"/>
+        <circle cx="60" cy="135" r="4" fill="#ffe600" opacity=".7"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- BAND 2 -->
+<div class="band" style="background:var(--bg)">
+  <div class="mq rev">
+    <span>GAME DEV · UNITY · MOBILE · MONETIZZAZIONE · LIVE OPS · </span>
+    <span>GAME DEV · UNITY · MOBILE · MONETIZZAZIONE · LIVE OPS · </span>
+    <span>GAME DEV · UNITY · MOBILE · MONETIZZAZIONE · LIVE OPS · </span>
+  </div>
+</div>
+
+<!-- OUR WORK -->
+<section id="work">
+  <div style="max-width:1200px;margin:0 auto 3rem">
+    <p class="section-label reveal">// 02 — Portfolio</p>
+    <h2 class="section-title reveal">I Nostri <span>Giochi</span></h2>
+    <div class="divider reveal"></div>
+    <p class="reveal" style="max-width:540px">Sei titoli dal nostro portfolio — dagli arcade runner ai puzzle strategici. Ogni gioco costruito da zero per i nostri clienti.</p>
+  </div>
+  <div class="work-grid stagger">
+
+    <div class="game-card">
+      <div class="game-art"><svg viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg">
+        <defs><radialGradient id="g1" cx="50%" cy="50%"><stop offset="0%" stop-color="#1a0530"/><stop offset="100%" stop-color="#0d0118"/></radialGradient><linearGradient id="t1" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#ff2d78" stop-opacity="0"/><stop offset="100%" stop-color="#ff2d78"/></linearGradient></defs>
+        <rect width="400" height="250" fill="url(#g1)"/>
+        <circle cx="30" cy="20" r="1" fill="white" opacity=".6"/><circle cx="80" cy="50" r="1.5" fill="white" opacity=".4"/><circle cx="150" cy="15" r="1" fill="white" opacity=".7"/><circle cx="320" cy="30" r="1" fill="white" opacity=".5"/><circle cx="370" cy="60" r="1.5" fill="white" opacity=".6"/>
+        <circle cx="320" cy="80" r="45" fill="#2d0a5c" stroke="#8b3fcf" stroke-width="1.5" opacity=".9"/>
+        <ellipse cx="320" cy="80" rx="60" ry="12" fill="none" stroke="#cf6fff" stroke-width="1.5" opacity=".5" transform="rotate(-15 320 80)"/>
+        <rect x="40" y="148" width="120" height="3" rx="2" fill="url(#t1)" opacity=".7"/>
+        <polygon points="160,150 130,162 130,138" fill="#ff2d78" filter="drop-shadow(0 0 8px #ff2d78)"/>
+        <line x1="160" y1="150" x2="260" y2="150" stroke="#ff2d78" stroke-width="2" opacity=".8" stroke-dasharray="6 4"/>
+        <text x="20" y="230" font-family="monospace" font-size="11" fill="#ff2d78" opacity=".8" letter-spacing="2">NEON DRIFT GALAXY</text>
+      </svg></div>
+      <div class="game-info"><div class="game-platform">iOS · Android</div><div class="game-title">Neon Drift Galaxy</div><div class="game-desc">Sparatutto arcade spaziale con livelli generati proceduralmente e sistema roguelite. Hyper-casual con profondità strategica.</div><div class="game-tag">Arcade Shooter</div></div>
+    </div>
+
+    <div class="game-card">
+      <div class="game-art"><svg viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0a1f12"/><stop offset="100%" stop-color="#03080a"/></linearGradient></defs>
+        <rect width="400" height="250" fill="url(#g2)"/>
+        <line x1="0" y1="180" x2="400" y2="180" stroke="#00ffe1" stroke-width=".5" opacity=".2"/>
+        <rect x="60" y="120" width="50" height="60" fill="#0d3d2a" stroke="#00ffe1" stroke-width="1.5" rx="3"/>
+        <rect x="60" y="90" width="50" height="30" fill="#0a5c3a" stroke="#00ffe1" stroke-width="1" rx="3"/>
+        <rect x="175" y="100" width="50" height="80" fill="#0d3d2a" stroke="#00ffe1" stroke-width="1.5" rx="3"/>
+        <rect x="175" y="70" width="50" height="30" fill="#00ffe1" stroke="#00ffe1" stroke-width="1" rx="3" opacity=".6"/>
+        <rect x="290" y="130" width="50" height="50" fill="#0d3d2a" stroke="#00ffe1" stroke-width="1.5" rx="3"/>
+        <circle cx="200" cy="58" r="12" fill="#00ffe1" opacity=".9"/>
+        <text x="10" y="235" font-family="monospace" font-size="11" fill="#00ffe1" opacity=".7" letter-spacing="2">TOWER RUSH 3D</text>
+      </svg></div>
+      <div class="game-info"><div class="game-platform">iOS · Android</div><div class="game-title">Tower Rush 3D</div><div class="game-desc">Tower defense strategico con visuale isometrica e meccaniche di costruzione in tempo reale. Tattica pura su mobile.</div><div class="game-tag">Strategy</div></div>
+    </div>
+
+    <div class="game-card">
+      <div class="game-art"><svg viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg">
+        <defs><radialGradient id="g3" cx="50%" cy="40%"><stop offset="0%" stop-color="#1a0a00"/><stop offset="100%" stop-color="#080500"/></radialGradient></defs>
+        <rect width="400" height="250" fill="url(#g3)"/>
+        <circle cx="200" cy="30" r="25" fill="#ffe600" opacity=".9" filter="drop-shadow(0 0 20px #ffe600)"/>
+        <rect x="0" y="170" width="400" height="80" fill="#1a0800"/>
+        <rect x="0" y="165" width="400" height="8" fill="#ff7a00" opacity=".4" rx="2"/>
+        <circle cx="100" cy="152" r="14" fill="#ff7a00"/>
+        <rect x="250" y="150" width="16" height="22" rx="3" fill="#ff4500" opacity=".8"/>
+        <rect x="300" y="148" width="22" height="24" rx="3" fill="#ff4500" opacity=".8"/>
+        <text x="10" y="235" font-family="monospace" font-size="11" fill="#ff7a00" opacity=".8" letter-spacing="2">BLAZE RUNNER</text>
+      </svg></div>
+      <div class="game-info"><div class="game-platform">iOS · Android</div><div class="game-title">Blaze Runner</div><div class="game-desc">Endless runner con generazione dinamica dei livelli, sistema combo e classifiche globali settimanali.</div><div class="game-tag">Endless Runner</div></div>
+    </div>
+
+    <div class="game-card">
+      <div class="game-art"><svg viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="g4" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0a0a2e"/><stop offset="100%" stop-color="#15053a"/></linearGradient></defs>
+        <rect width="400" height="250" fill="url(#g4)"/>
+        <polygon points="140,60 160,73 160,99 140,112 120,99 120,73" fill="#3b1a8a" stroke="#7c3aed" stroke-width="1.5" opacity=".8"/>
+        <polygon points="220,60 240,73 240,99 220,112 200,99 200,73" fill="#6d28d9" stroke="#a78bfa" stroke-width="2" opacity=".9"/>
+        <polygon points="300,60 320,73 320,99 300,112 280,99 280,73" fill="#3b1a8a" stroke="#7c3aed" stroke-width="1.5" opacity=".7"/>
+        <polygon points="120,110 140,123 140,149 120,162 100,149 100,123" fill="#5b21b6" stroke="#a78bfa" stroke-width="2" opacity=".9"/>
+        <polygon points="200,110 220,123 220,149 200,162 180,149 180,123" fill="#4c1d95" stroke="#7c3aed" stroke-width="1.5" opacity=".8"/>
+        <polygon points="280,110 300,123 300,149 280,162 260,149 260,123" fill="#5b21b6" stroke="#a78bfa" stroke-width="2" opacity=".8"/>
+        <polygon points="220,75 228,85 220,95 212,85" fill="#a78bfa" opacity=".9"/>
+        <polygon points="120,125 128,135 120,145 112,135" fill="#60a5fa" opacity=".9"/>
+        <text x="10" y="235" font-family="monospace" font-size="11" fill="#a78bfa" opacity=".8" letter-spacing="2">GEM HEIST PUZZLE</text>
+      </svg></div>
+      <div class="game-info"><div class="game-platform">iOS · Android</div><div class="game-title">Gem Heist Puzzle</div><div class="game-desc">Puzzle match-3 con meccaniche heist e missioni narrative. Oltre 600 livelli con boss unici e sfide speciali.</div><div class="game-tag">Match-3 Puzzle</div></div>
+    </div>
+
+    <div class="game-card">
+      <div class="game-art"><svg viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="g5" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#001a33"/><stop offset="100%" stop-color="#000d1a"/></linearGradient></defs>
+        <rect width="400" height="250" fill="url(#g5)"/>
+        <path d="M0,170 Q50,155 100,170 Q150,185 200,170 Q250,155 300,170 Q350,185 400,170 L400,250 L0,250Z" fill="#003366" opacity=".7"/>
+        <path d="M0,185 Q50,170 100,185 Q150,200 200,185 Q250,170 300,185 Q350,200 400,185 L400,250 L0,250Z" fill="#004080" opacity=".5"/>
+        <polygon points="160,145 240,145 230,165 170,165" fill="#1a6b9a"/>
+        <rect x="190" y="110" width="4" height="38" fill="#c0a060"/>
+        <polygon points="194,110 230,130 194,145" fill="white" opacity=".9"/>
+        <circle cx="350" cy="50" r="20" fill="#1a4a7a" stroke="#60c0ff" stroke-width="1.5"/>
+        <text x="10" y="235" font-family="monospace" font-size="11" fill="#60c0ff" opacity=".8" letter-spacing="2">OCEAN DRIFT</text>
+      </svg></div>
+      <div class="game-info"><div class="game-platform">iOS · Android</div><div class="game-title">Ocean Drift</div><div class="game-desc">Gioco di navigazione rilassante con elementi survival e costruzione. Esplora isole e gestisci le risorse del tuo equipaggio.</div><div class="game-tag">Idle Survival</div></div>
+    </div>
+
+    <div class="game-card">
+      <div class="game-art"><svg viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg">
+        <defs><radialGradient id="g6" cx="50%" cy="50%"><stop offset="0%" stop-color="#1f0a0a"/><stop offset="100%" stop-color="#080303"/></radialGradient></defs>
+        <rect width="400" height="250" fill="url(#g6)"/>
+        <line x1="50" y1="50" x2="300" y2="50" stroke="#ff2d78" stroke-width=".8" opacity=".3"/>
+        <line x1="150" y1="50" x2="150" y2="100" stroke="#ff2d78" stroke-width=".8" opacity=".3"/>
+        <line x1="150" y1="100" x2="300" y2="100" stroke="#ff2d78" stroke-width=".8" opacity=".3"/>
+        <rect x="155" y="60" width="90" height="80" rx="10" fill="#1a0808" stroke="#ff2d78" stroke-width="2"/>
+        <rect x="170" y="80" width="22" height="16" rx="4" fill="#ff2d78" opacity=".9"/>
+        <rect x="208" y="80" width="22" height="16" rx="4" fill="#ff2d78" opacity=".9"/>
+        <rect x="175" y="112" width="50" height="8" rx="4" fill="#ff2d78" opacity=".5"/>
+        <rect x="80" y="175" width="240" height="10" rx="5" fill="#330a0a"/>
+        <rect x="80" y="175" width="160" height="10" rx="5" fill="#ff2d78" opacity=".8"/>
+        <text x="10" y="235" font-family="monospace" font-size="11" fill="#ff2d78" opacity=".8" letter-spacing="2">ROGUE BOTS</text>
+      </svg></div>
+      <div class="game-info"><div class="game-platform">iOS · Android</div><div class="game-title">Rogue Bots</div><div class="game-desc">Auto-battler roguelite con collezione di robot, crafting e PvP asincrono contro giocatori di tutto il mondo.</div><div class="game-tag">Roguelite · PvP</div></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- BAND 3 -->
+<div class="band" style="background:var(--bg2)">
+  <div class="mq">
+    <span>CLIENTI · PARTNER · PUBLISHER · CLIENTI · PARTNER · </span>
+    <span>CLIENTI · PARTNER · PUBLISHER · CLIENTI · PARTNER · </span>
+    <span>CLIENTI · PARTNER · PUBLISHER · CLIENTI · PARTNER · </span>
+  </div>
+</div>
+
+<!-- TRUSTED -->
+<section id="trusted">
+  <div style="max-width:1200px;margin:0 auto 3rem">
+    <p class="section-label reveal">// 03 — Clienti</p>
+    <h2 class="section-title reveal">Ci Hanno <span>Scelto</span></h2>
+    <div class="divider reveal"></div>
+    <p class="reveal">Aziende che hanno scelto MellaRuda — da agenzie pubblicitarie a publisher internazionali di giochi.</p>
+  </div>
+  <div class="logos-grid stagger">
+    <div class="logo-item"><svg class="logo-icon" viewBox="0 0 40 40"><polygon points="20,4 36,13 36,27 20,36 4,27 4,13" fill="none" stroke="#00ffe1" stroke-width="1.5" opacity=".5"/><text x="20" y="24" text-anchor="middle" font-family="monospace" font-size="10" fill="#00ffe1" font-weight="bold">NX</text></svg><div class="logo-name">Nexaplay</div></div>
+    <div class="logo-item"><svg class="logo-icon" viewBox="0 0 40 40"><rect x="8" y="8" width="24" height="24" rx="4" fill="none" stroke="#ff2d78" stroke-width="1.5" opacity=".5"/><text x="20" y="24" text-anchor="middle" font-family="monospace" font-size="10" fill="#ff2d78" font-weight="bold">ZK</text></svg><div class="logo-name">Zenko Games</div></div>
+    <div class="logo-item"><svg class="logo-icon" viewBox="0 0 40 40"><circle cx="20" cy="20" r="14" fill="none" stroke="#ffe600" stroke-width="1.5" opacity=".5"/><text x="20" y="24" text-anchor="middle" font-family="monospace" font-size="10" fill="#ffe600" font-weight="bold">VX</text></svg><div class="logo-name">Voltex Media</div></div>
+    <div class="logo-item"><svg class="logo-icon" viewBox="0 0 40 40"><polygon points="20,6 34,34 6,34" fill="none" stroke="#60c0ff" stroke-width="1.5" opacity=".5"/><text x="20" y="28" text-anchor="middle" font-family="monospace" font-size="10" fill="#60c0ff" font-weight="bold">AL</text></svg><div class="logo-name">Alpha Loop</div></div>
+    <div class="logo-item"><svg class="logo-icon" viewBox="0 0 40 40"><rect x="6" y="6" width="28" height="28" rx="14" fill="none" stroke="#a78bfa" stroke-width="1.5" opacity=".5"/><text x="20" y="24" text-anchor="middle" font-family="monospace" font-size="10" fill="#a78bfa" font-weight="bold">OR</text></svg><div class="logo-name">Orion Studios</div></div>
+    <div class="logo-item"><svg class="logo-icon" viewBox="0 0 40 40"><polygon points="20,4 36,13 36,27 20,36 4,27 4,13" fill="none" stroke="#ff7a00" stroke-width="1.5" opacity=".5"/><text x="20" y="24" text-anchor="middle" font-family="monospace" font-size="10" fill="#ff7a00" font-weight="bold">BF</text></svg><div class="logo-name">BrightFire</div></div>
+    <div class="logo-item"><svg class="logo-icon" viewBox="0 0 40 40"><rect x="8" y="8" width="24" height="24" fill="none" stroke="#00ffe1" stroke-width="1.5" opacity=".5"/><text x="20" y="24" text-anchor="middle" font-family="monospace" font-size="10" fill="#00ffe1" font-weight="bold">KP</text></svg><div class="logo-name">Krypton Play</div></div>
+    <div class="logo-item"><svg class="logo-icon" viewBox="0 0 40 40"><circle cx="20" cy="20" r="14" fill="none" stroke="#ff2d78" stroke-width="1.5" opacity=".5"/><text x="20" y="24" text-anchor="middle" font-family="monospace" font-size="10" fill="#ff2d78" font-weight="bold">SG</text></svg><div class="logo-name">Surge Group</div></div>
+    <div class="logo-item"><svg class="logo-icon" viewBox="0 0 40 40"><polygon points="20,6 34,34 6,34" fill="none" stroke="#ffe600" stroke-width="1.5" opacity=".5"/><text x="20" y="28" text-anchor="middle" font-family="monospace" font-size="10" fill="#ffe600" font-weight="bold">EC</text></svg><div class="logo-name">EchoCraft</div></div>
+    <div class="logo-item"><svg class="logo-icon" viewBox="0 0 40 40"><rect x="6" y="6" width="28" height="28" rx="14" fill="none" stroke="#60c0ff" stroke-width="1.5" opacity=".5"/><text x="20" y="24" text-anchor="middle" font-family="monospace" font-size="10" fill="#60c0ff" font-weight="bold">DP</text></svg><div class="logo-name">DeepPlay</div></div>
+    <div class="logo-item"><svg class="logo-icon" viewBox="0 0 40 40"><polygon points="20,4 36,13 36,27 20,36 4,27 4,13" fill="none" stroke="#a78bfa" stroke-width="1.5" opacity=".5"/><text x="20" y="24" text-anchor="middle" font-family="monospace" font-size="10" fill="#a78bfa" font-weight="bold">NV</text></svg><div class="logo-name">Nova Ventures</div></div>
+    <div class="logo-item"><svg class="logo-icon" viewBox="0 0 40 40"><rect x="8" y="8" width="24" height="24" rx="4" fill="none" stroke="#ff7a00" stroke-width="1.5" opacity=".5"/><text x="20" y="24" text-anchor="middle" font-family="monospace" font-size="10" fill="#ff7a00" font-weight="bold">QG</text></svg><div class="logo-name">Quasar Games</div></div>
+  </div>
+</section>
+
+<!-- BAND 4 -->
+<div class="band" style="background:var(--bg)">
+  <div class="mq rev">
+    <span>DESIGN · CODICE · TEST · LANCIO · ITERAZIONE · </span>
+    <span>DESIGN · CODICE · TEST · LANCIO · ITERAZIONE · </span>
+    <span>DESIGN · CODICE · TEST · LANCIO · ITERAZIONE · </span>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section id="services">
+  <div style="max-width:1200px;margin:0 auto 3rem">
+    <p class="section-label reveal">// 04 — Cosa Facciamo</p>
+    <h2 class="section-title reveal">I Nostri <span>Servizi</span></h2>
+    <div class="divider reveal"></div>
+  </div>
+  <div class="services-grid stagger">
+    <div class="service-card">
+      <svg class="service-icon" viewBox="0 0 52 52"><rect x="6" y="6" width="40" height="40" rx="8" fill="none" stroke="#00ffe1" stroke-width="1.5" opacity=".6"/><polygon points="26,14 38,32 14,32" fill="none" stroke="#00ffe1" stroke-width="2"/><circle cx="26" cy="35" r="3" fill="#00ffe1" opacity=".7"/></svg>
+      <div class="service-name">Game Design</div>
+      <div class="service-desc">Progettiamo GDD completi, meccaniche, sistemi di progressione e monetizzazione su misura per il target e la piattaforma.</div>
+    </div>
+    <div class="service-card">
+      <svg class="service-icon" viewBox="0 0 52 52"><rect x="8" y="12" width="36" height="28" rx="5" fill="none" stroke="#ff2d78" stroke-width="1.5" opacity=".6"/><line x1="8" y1="20" x2="44" y2="20" stroke="#ff2d78" stroke-width="1" opacity=".4"/><circle cx="16" cy="16" r="2.5" fill="#ff2d78" opacity=".7"/><circle cx="23" cy="16" r="2.5" fill="#ff2d78" opacity=".5"/><circle cx="30" cy="16" r="2.5" fill="#ff2d78" opacity=".3"/></svg>
+      <div class="service-name">Unity Development</div>
+      <div class="service-desc">Implementazione di giochi in Unity 6 ottimizzata per iOS e Android. Fisica, AI, animazioni e multiplayer in rete.</div>
+    </div>
+    <div class="service-card">
+      <svg class="service-icon" viewBox="0 0 52 52"><circle cx="26" cy="26" r="18" fill="none" stroke="#ffe600" stroke-width="1.5" opacity=".6"/><circle cx="26" cy="26" r="10" fill="none" stroke="#ffe600" stroke-width="1" opacity=".4"/><circle cx="26" cy="26" r="3" fill="#ffe600" opacity=".8"/><line x1="26" y1="8" x2="26" y2="18" stroke="#ffe600" stroke-width="1.5" opacity=".6"/></svg>
+      <div class="service-name">2D / 3D Art</div>
+      <div class="service-desc">Produzione di asset grafici, animazioni, UI ed effetti VFX in qualsiasi stile — dal pixel art al render fotorealistico.</div>
+    </div>
+    <div class="service-card">
+      <svg class="service-icon" viewBox="0 0 52 52"><rect x="10" y="16" width="32" height="20" rx="4" fill="none" stroke="#60c0ff" stroke-width="1.5" opacity=".6"/><circle cx="18" cy="26" r="5" fill="none" stroke="#60c0ff" stroke-width="1.5" opacity=".7"/><line x1="18" y1="22" x2="18" y2="30" stroke="#60c0ff" stroke-width="1.5" opacity=".7"/><line x1="14" y1="26" x2="22" y2="26" stroke="#60c0ff" stroke-width="1.5" opacity=".7"/><circle cx="34" cy="23" r="2.5" fill="#60c0ff" opacity=".7"/><circle cx="40" cy="26" r="2.5" fill="#60c0ff" opacity=".5"/><circle cx="34" cy="29" r="2.5" fill="#60c0ff" opacity=".3"/></svg>
+      <div class="service-name">UX & Game Feel</div>
+      <div class="service-desc">Design delle interfacce, test di usabilità, juice & polish — curiamo ogni frame e ogni suono di interazione.</div>
+    </div>
+    <div class="service-card">
+      <svg class="service-icon" viewBox="0 0 52 52"><polygon points="26,8 44,18 44,34 26,44 8,34 8,18" fill="none" stroke="#a78bfa" stroke-width="1.5" opacity=".6"/><line x1="26" y1="8" x2="26" y2="44" stroke="#a78bfa" stroke-width=".8" opacity=".3"/><line x1="8" y1="18" x2="44" y2="18" stroke="#a78bfa" stroke-width=".8" opacity=".3"/><line x1="8" y1="34" x2="44" y2="34" stroke="#a78bfa" stroke-width=".8" opacity=".3"/></svg>
+      <div class="service-name">Backend & Live Ops</div>
+      <div class="service-desc">Server di gioco, leaderboard, eventi stagionali, A/B test e sistemi di pagamento in-app per iOS e Google Play.</div>
+    </div>
+    <div class="service-card">
+      <svg class="service-icon" viewBox="0 0 52 52"><path d="M10,40 L10,30 L20,30 L20,20 L30,20 L30,28 L40,28 L40,40Z" fill="none" stroke="#ff7a00" stroke-width="1.5" opacity=".7"/><line x1="10" y1="40" x2="40" y2="40" stroke="#ff7a00" stroke-width="1" opacity=".4"/></svg>
+      <div class="service-name">Analytics & Growth</div>
+      <div class="service-desc">Integrazione di Firebase, Amplitude, Adjust. Analizziamo retention, LTV, ARPU e ottimizziamo il funnel di monetizzazione.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="reveal-left">
+      <p class="section-label">// 05 — Scrivici</p>
+      <h2 class="section-title">Inizia un <span>Progetto</span></h2>
+      <div class="divider"></div>
+      <p style="margin-bottom:2.5rem;line-height:1.8">Hai un'idea per un gioco? Raccontacela. Preventivo gratuito e consulenza entro 24 ore.</p>
+      <div class="contact-item">
+        <div class="contact-icon"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M2 5a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm2 0l6 5 6-5H4zm0 2v6h12V7l-6 5-6-5z" fill="#00ffe1" fill-rule="evenodd"/></svg></div>
+        <div><div class="contact-label">Email</div><div class="contact-value">hello@mellaruda.com</div></div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.773-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" fill="#00ffe1"/></svg></div>
+        <div><div class="contact-label">Telefono</div><div class="contact-value">+39 02 4871 3390</div></div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon"><svg width="20" height="20" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" fill="#00ffe1" clip-rule="evenodd"/></svg></div>
+        <div><div class="contact-label">Indirizzo</div><div class="contact-value">Via Cristoforo Lumetti, 14 — 20121 Milano</div></div>
+      </div>
+    </div>
+    <div class="reveal-right">
+      <div class="contact-form">
+        <div class="form-row">
+          <input type="text" placeholder="Nome e cognome">
+          <input type="email" placeholder="Indirizzo e-mail">
+        </div>
+        <input type="text" placeholder="Oggetto / tipo di gioco">
+        <textarea placeholder="Descrivi il tuo progetto..."></textarea>
+        <button class="btn btn-primary" style="align-self:flex-start">Invia messaggio</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Mella<span>Ruda</span> Studio</div>
+  <div class="footer-copy">© 2008–2025 MellaRuda Studio S.r.l. · Tutti i diritti riservati</div>
+  <div style="display:flex;gap:1rem">
+    <a href="#" style="font-family:Space Mono;font-size:.65rem;color:rgba(200,223,240,.35);text-decoration:none;letter-spacing:.1em">Privacy</a>
+    <a href="#" style="font-family:Space Mono;font-size:.65rem;color:rgba(200,223,240,.35);text-decoration:none;letter-spacing:.1em">Termini</a>
+  </div>
+</footer>
+
+<script>
+  // Mark JS available — reveal elements start hidden only when JS runs
+  document.documentElement.classList.add('js');
+
+  // Custom cursor
+  const cur = document.getElementById('cursor');
+  const ring = document.getElementById('cursor-ring');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+  (function tick(){
+    cur.style.transform=`translate(${mx-7}px,${my-7}px)`;
+    rx+=(mx-rx-19)*.12; ry+=(my-ry-19)*.12;
+    ring.style.transform=`translate(${rx}px,${ry}px)`;
+    requestAnimationFrame(tick);
+  })();
+
+  // Particle canvas
+  const cv=document.getElementById('particleCanvas');
+  const ctx=cv.getContext('2d');
+  function rsz(){cv.width=innerWidth;cv.height=innerHeight;}
+  rsz();window.addEventListener('resize',rsz);
+  const pts=Array.from({length:65},()=>({
+    x:Math.random()*innerWidth,y:Math.random()*innerHeight,
+    r:Math.random()*1.3+.3,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,a:Math.random()*.45+.15
+  }));
+  (function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    pts.forEach((p,i)=>{
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(0,255,225,${p.a})`;ctx.fill();
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0||p.x>cv.width)p.vx*=-1;
+      if(p.y<0||p.y>cv.height)p.vy*=-1;
+      for(let j=i+1;j<pts.length;j++){
+        const q=pts[j],dx=p.x-q.x,dy=p.y-q.y,d=Math.hypot(dx,dy);
+        if(d<95){ctx.beginPath();ctx.strokeStyle=`rgba(0,255,225,${.11*(1-d/95)})`;ctx.lineWidth=.5;ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();}
+      }
+    });
+    requestAnimationFrame(draw);
+  })();
+
+  // Scroll reveal
+  const io=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('on');});
+  },{threshold:.08});
+  document.querySelectorAll('.reveal,.reveal-left,.reveal-right,.stagger').forEach(el=>io.observe(el));
+
+  // Nav on scroll
+  window.addEventListener('scroll',()=>{
+    document.getElementById('nav').style.background=
+      scrollY>60?'rgba(4,10,18,0.98)':'rgba(4,10,18,0.92)';
+  });
+</script>
+</body>
+</html>
